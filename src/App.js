@@ -1,23 +1,49 @@
 import React, { Component } from 'react'
-import './App.css'
+import AppBar from 'material-ui/AppBar'
+import {Tabs, Tab} from 'material-ui/Tabs'
+import {Route, Switch} from 'react-router-dom'
+import {connect} from 'react-redux'
+import {routerActions} from 'react-router-redux'
 
 class App extends Component {
   render () {
+    const {tabValue} = this.props
     return (
       <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
-        <div style={{display: 'flex', height: '44px', backgroundColor: 'black', alignItems: 'center', paddingLeft: '10px'}}>
-          <span style={{color: 'white', fontSize: '18px'}}>title</span>
+        <AppBar
+          title={'Github App'}
+        />
+        <div style={{ flexGrow: 1 }}>
+          <Switch>
+            <Route path='/A' render={() => (<span>A</span>)} />
+            <Route path='/B' render={() => (<span>B</span>)} />
+            <Route path='/C' render={() => (<span>C</span>)} />
+            <Route path='*' render={() => (<span>empty</span>)} />
+          </Switch>
         </div>
-        <div style={{flexGrow: 1}}>A</div>
-        <div style={{display: 'flex', color: 'red', height: '44px', alignItems: 'center'}}>
-          <button style={{flexGrow: 1, height: '100%'}}>A</button>
-          <button style={{flexGrow: 1, height: '100%'}}>B</button>
-          <button style={{flexGrow: 1, height: '100%'}}>C</button>
-          <button style={{flexGrow: 1, height: '100%'}}>D</button>
-        </div>
+        <Tabs
+          value={tabValue}
+          onChange={value => this.onTabChange(value)}
+        >
+          <Tab label='A' value='/A' />
+          <Tab label='B' value='/B' />
+          <Tab label='C' value='/C' />
+        </Tabs>
       </div>
     )
   }
+
+  onTabChange (value) {
+    this.props.changeTabValue(value)
+  }
 }
 
-export default App
+export default connect(state => ({
+  tabValue: state.app.tabValue || state.router.location.pathname
+}), dispatch => ({
+  changeTabValue (value) {
+    dispatch({ type: 'CHANGE_TAB', payload: value })
+    dispatch(routerActions.replace(value))
+  }
+})
+)(App)
